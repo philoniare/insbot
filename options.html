@@ -1,0 +1,74 @@
+<html>
+<head>
+    <title>Аялах өдрөө сонгоно уу?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+<body>
+<script>
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.com/en_US/messenger.Extensions.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'Messenger'));
+
+    window.extAsyncInit = () => {
+        MessengerExtensions.getSupportedFeatures(function success(result) {
+            let features = result.supported_features;
+            if (features.includes("context")) {
+                MessengerExtensions.getContext('185993182469265',
+                    function success(thread_context) {
+                        document.getElementById("psid").value = thread_context.psid;
+                    },
+                    function error(err) {
+                        console.log(err);
+                    }
+                );
+            }
+        }, function error(err) {
+            console.log(err);
+        });
+    };
+
+</script>
+  <div class="container">
+    <input type="hidden" name="psid" id="psid">
+  <label for="startDate">Эхлэх өдөр</label>
+  <input type="text" class="datepicker" id="startDate">
+  <label for="endDate">Дуусах өдөр</label>
+  <input type="text" class="datepicker" id="endDate">
+  <a id="submitDate" class="waves-effect waves-light btn">Оруулах</a>  
+  </div>
+  
+  
+  <script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      $('.datepicker').datepicker();
+      $('#submitDate').click(function() {
+        
+        var data = {'psid': $('#psid').val(),
+                'startDate': $('#startDate').val(),
+                 'endDate': $('#endDate').val()
+                };
+        $.post('/optionspostback', data).done(function() {
+          MessengerExtensions.requestCloseBrowser(function success() {
+                console.log("Webview closing");
+            }, function error(err) {
+                console.log(err);
+            });
+        }); 
+      });
+  });
+  </script>
+</body>
+</html>
